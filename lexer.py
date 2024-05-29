@@ -24,7 +24,7 @@ class Lexer:
 
         # Let's take integer -1 to represent the error state for this DFA
         self.Tx = [[-1 for j in range(self.cols)] for i in range(self.rows)]
-        self.InitialiseTxTable();     
+        self.InitialiseTxTable()
 
     def InitialiseTxTable(self):
         # Update Tx to represent the state transition function of the DFA
@@ -40,10 +40,10 @@ class Lexer:
         self.Tx[2][self.lexeme_list.index("ws")] = 2
 
         # Eq sign (=)
-        self.Tx[0][self.lexeme_list.index("eq")] = 3        
+        self.Tx[0][self.lexeme_list.index("eq")] = 3
 
         # Integers and Literals
-        self.Tx[0][self.lexeme_list.index("digit")] = 4        
+        self.Tx[0][self.lexeme_list.index("digit")] = 4
         self.Tx[4][self.lexeme_list.index("digit")] = 4
         self.Tx[4][self.lexeme_list.index("dot")] = 8  # Transition to state 8 for float numbers
         self.Tx[8][self.lexeme_list.index("digit")] = 8
@@ -133,7 +133,7 @@ class Lexer:
     def NextChar(self, src_program_str, src_program_idx):
         if not self.EndOfInput(src_program_str, src_program_idx):
             return True, src_program_str[src_program_idx]
-        else: 
+        else:
             return False, "."
 
     def NextToken(self, src_program_str, src_program_idx):
@@ -141,20 +141,20 @@ class Lexer:
         stack = []
         lexeme = ""
         start_idx = src_program_idx
-        stack.append(-2);  # insert the error state at the bottom of the stack.
-        
+        stack.append(-2)  # insert the error state at the bottom of the stack.
+
         while state != -1:
-            if self.AcceptingStates(state): 
+            if self.AcceptingStates(state):
                 stack.clear()
             stack.append(state)
-            
+
             exists, character = self.NextChar(src_program_str, src_program_idx)
             if not exists:
                 break  # Break out of loop if we're at the end of the string
 
             lexeme += character
             src_program_idx += 1
-            
+
             cat = self.CatChar(character)
             if cat not in self.lexeme_list:
                 state = -1
@@ -162,14 +162,14 @@ class Lexer:
                 state = self.Tx[state][self.lexeme_list.index(cat)]
 
         if lexeme:
-            lexeme = lexeme[:-1]  # remove the last character added which sent the lexer to state -1    
+            lexeme = lexeme[:-1]  # remove the last character added which sent the lexer to state -1
 
         syntax_error = False
         # rollback
         while len(stack) > 0:
             if stack[-1] == -2:  # report a syntax error
                 syntax_error = True
-                break    
+                break
 
             # Pop this state if not an accepting state.
             if not self.AcceptingStates(stack[-1]):
@@ -177,20 +177,25 @@ class Lexer:
                 if lexeme:
                     lexeme = lexeme[:-1]
                 src_program_idx -= 1
-            
-            # This is an accepting state ... return it.    
+
+            # This is an accepting state ... return it.
             else:
                 state = stack.pop()
                 break
-        
+
         if syntax_error:
-            print(f"Syntax error at index {start_idx}: {src_program_str[start_idx]}")
-            src_program_idx = start_idx + 1  # Move to the next character after error
-            return (TokenType.LEXICAL_ERROR.value, src_program_str[start_idx]), src_program_str[start_idx]
+            # Continue collecting characters until whitespace or semicolon is found
+            while True:
+                exists, character = self.NextChar(src_program_str, src_program_idx)
+                if not exists or character.isspace() or character == ";":
+                    break
+                lexeme += character
+                src_program_idx += 1
+            return (TokenType.LEXICAL_ERROR.value, lexeme), lexeme
 
         if self.AcceptingStates(state):
             return self.GetTokenTypeByFinalState(state, lexeme), lexeme
-        else: 
+        else:
             return (TokenType.LEXICAL_ERROR.value, lexeme), lexeme
 
     def GenerateTokens(self, src_program_str):
@@ -202,7 +207,7 @@ class Lexer:
             if token[0] != TokenType.WHITESPACE.value:
                 tokens_list.append(token)
             if token[0] == TokenType.LEXICAL_ERROR.value:
-                src_program_idx += 1  # Skip the erroneous character
+                src_program_idx += len(lexeme)  # Skip the erroneous lexeme
             else:
                 src_program_idx += len(lexeme)
             print(f"Processed token: {token}, lexeme: {lexeme}, next index: {src_program_idx}")
@@ -235,14 +240,14 @@ fun Race(p1_c:colour , p2_c:colour , score_max:int) -> int {
     }
     return 1;
 }
-
+¢lexicalerror_
 let c1:colour = #00ff00;
 let c2:colour = #0000ff;
 let m:int = __height;
 let w:int = Race(c1, c2, m);
 __print w;
 """)
-with open ("tokens.txt", "w") as f:
+with open("tokens.txt", "w") as f:
     for t in toks:
         f.write(f"{t}\n")
 

@@ -117,6 +117,7 @@
 ('LITERAL', '1')
 ('DELIMITER', ';')
 ('DELIMITER', '}')
+('LEXICAL_ERROR', '¢lexicalerror_')
 ('KEYWORD', 'let')
 ('IDENTIFIER', 'c1')
 ('DELIMITER', ':')
