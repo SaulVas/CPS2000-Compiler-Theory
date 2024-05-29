@@ -253,7 +253,16 @@ class Parser:
         token = self.current_token
         if token[0] == 'LITERAL':
             self.advance()
-            return LiteralNode(token[1])
+            if token[1] in {"true", "false"}:
+                value = True if token[1] == "true" else False
+                return LiteralNode(value)
+            elif token[1].startswith("#"):
+                return LiteralNode(token[1])
+            elif token[1].isdigit() or (token[1].replace('.', '', 1).isdigit() and token[1].count('.') < 2):
+                value = int(token[1]) if '.' not in token[1] else float(token[1])
+                return LiteralNode(value)
+            else:
+                raise SyntaxError(f"Unexpected literal {token[1]}")
         elif token[0] == 'IDENTIFIER':
             identifier = token[1]
             self.advance()
@@ -283,77 +292,79 @@ class Parser:
             return FunctionCallNode(func_name, args)
         raise SyntaxError(f"Unexpected token in expression: {token}")
 
+
     def expect(self, token_type, value=None):
         if self.current_token[0] != token_type or (value and self.current_token[1] != value):
             raise SyntaxError(f"Expected token {token_type} with value {value}, but got {self.current_token}")
         self.advance()
 
-# Example usage
-lexer = Lexer()
-input_code = '''
-fun XGreaterY(x:int, y:int) -> bool {
-    let ans:bool = true;
-    if (y>x) {ans = false;}
-    return ans;
-}
+if __name__ == '__main__':
+    # Example usage
+    lexer = Lexer()
+    input_code = '''
+    fun XGreaterY(x:int, y:int) -> bool {
+        let ans:bool = true;
+        if (y>x) {ans = false;}
+        return ans;
+    }
 
-fun XGreaterY_2(x:int, y:int) -> bool {
-    return x>y;
-}
+    fun XGreaterY_2(x:int, y:int) -> bool {
+        return x>y;
+    }
 
-fun AverageOfTwo(x:int, y:int) -> float {
-    let t0:int = x + y;
-    let t1:float = t0 / 2 as float;
-    return t1;
-}
+    fun AverageOfTwo(x:int, y:int) -> float {
+        let t0:int = x + y;
+        let t1:float = t0 / 2 as float;
+        return t1;
+    }
 
-fun AverageOfTwo_2(x:int, y:int) -> int {
-    return (x + y) / 2 as float;
-}
+    fun AverageOfTwo_2(x:int, y:int) -> float {
+        return (x + y) / 2 as float;
+    }
 
-fun Max(x:int, y:int) -> int {
-    let m:int = x;
-    if (y > x) { m = y; }
-    return m;
-}
+    fun Max(x:int, y:int) -> int {
+        let m:int = x;
+        if (y > x) { m = y; }
+        return m;
+    }
 
-__write 10, 14, #00ff00;
-__delay 100;
-__write_box 10, 14, 2, 2, #0000ff;
+    __write 10, 14, #00ff00;
+    __delay 100;
+    __write_box 10, 14, 2, 2, #0000ff;
 
-for (let i:int = 0; i < 10; i = i + 1) {
-    __print i;
-    __delay 1000;
-}
+    for (let i:int = 0; i < 10; i = i + 1) {
+        __print i;
+        __delay 1000;
+    }
 
-fun Race(p1_c:colour , p2_c:colour , score_max:int) -> int {
-    let p1_score:int = 0;
-    let p2_score:int = 0;
-    while ((p1_score < score_max) and (p2_score < score_max)) {
-        let p1_toss:int = __randi 1000;
-        let p2_toss:int = __randi 1000;
-        if (p1_toss > p2_toss) {
-            p1_score = p1_score + 1;
-            __write 1, p1_score, p1_c;
-        } else {
-            p2_score = p2_score + 1;
-            __write 2, p2_score, p2_c;
+    fun Race(p1_c:colour , p2_c:colour , score_max:int) -> int {
+        let p1_score:int = 0;
+        let p2_score:int = 0;
+        while ((p1_score < score_max) and (p2_score < score_max)) {
+            let p1_toss:int = __randi 1000;
+            let p2_toss:int = __randi 1000;
+            if (p1_toss > p2_toss) {
+                p1_score = p1_score + 1;
+                __write 1, p1_score, p1_c;
+            } else {
+                p2_score = p2_score + 1;
+                __write 2, p2_score, p2_c;
+            }
+            __delay 100;
         }
-        __delay 100;
+        if (p2_score > p1_score) {
+            return 2;
+        }
+        return 1;
     }
-    if (p2_score > p1_score) {
-        return 2;
-    }
-    return 1;
-}
 
-let c1:colour = #00ff00;
-let c2:colour = #0000ff;
-let m:int = __height;
-let w:int = Race(c1, c2, m);
-__print w;
-'''
-tokens = lexer.GenerateTokens(input_code)
-parser = Parser(tokens)
-ast = parser.parse()
-traverse(ast)
+    let c1:colour = #00ff00;
+    let c2:colour = #0000ff;
+    let m:int = __height;
+    let w:int = Race(c1, c2, m);
+    __print w;
+    '''
+    tokens = lexer.GenerateTokens(input_code)
+    parser = Parser(tokens)
+    ast = parser.parse()
+    traverse(ast)

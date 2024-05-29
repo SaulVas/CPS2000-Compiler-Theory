@@ -77,6 +77,7 @@ class Lexer:
         keywords = {"fun", "let", "return", "if", "else", "for", "while", "as", "int", "float", "bool", "colour"}
         special_functions = {"__print", "__delay", "__write", "__write_box", "__random_int", "__width", "__height", "__read", "__randi"}
         operators = {"and", "or", "not"}
+        boolean_literals = {"true", "false"}
 
         if state == 1:
             if lexeme in keywords:
@@ -85,16 +86,14 @@ class Lexer:
                 return (TokenType.SPECIAL_FUNCTION.value, lexeme)
             elif lexeme in operators:
                 return (TokenType.OPERATOR.value, lexeme)
+            elif lexeme in boolean_literals:
+                return (TokenType.LITERAL.value, lexeme)
             return (TokenType.IDENTIFIER.value, lexeme)
         elif state == 2:
             return (TokenType.WHITESPACE.value, lexeme)
         elif state == 3:
             return (TokenType.OPERATOR.value, lexeme)
         elif state == 4:
-            if "." in lexeme:
-                return (TokenType.LITERAL.value, lexeme)
-            elif lexeme in {"true", "false"}:
-                return (TokenType.LITERAL.value, lexeme)
             return (TokenType.LITERAL.value, lexeme)
         elif state == 5:
             return (TokenType.DELIMITER.value, lexeme)
@@ -110,6 +109,7 @@ class Lexer:
             return (TokenType.ARROW.value, lexeme)
         else:
             return (TokenType.LEXICAL_ERROR.value, lexeme)
+
 
     def CatChar(self, character):
         cat = "other"
@@ -210,46 +210,81 @@ class Lexer:
                 src_program_idx += len(lexeme)  # Skip the erroneous lexeme
             else:
                 src_program_idx += len(lexeme)
-            print(f"Processed token: {token}, lexeme: {lexeme}, next index: {src_program_idx}")
 
             if src_program_idx >= (len(src_program_str) - 1):
                 break  # Explicitly break the loop if we've reached the end of the input string
 
         return tokens_list
 
+if __name__ == "__main__":
+    lex = Lexer()
+    input_code = '''
+    fun XGreaterY(x:int, y:int) -> bool {
+        let ans:bool = true;
+        if (y>x) {ans = false;}
+        return ans;
+    }
 
-lex = Lexer()
-toks = lex.GenerateTokens("""
-fun Race(p1_c:colour , p2_c:colour , score_max:int) -> int {
-    let p1_score:int = 0;
-    let p2_score:int = 0;
-    while ((p1_score < score_max) and (p2_score < score_max)) {
-        let p1_toss:int = __randi 1000;
-        let p2_toss:int = __randi 1000;
-        if (p1_toss > p2_toss) {
-            p1_score = p1_score + 1;
-            __write 1, p1_score, p1_c;
-        } else {
-            p2_score = p2_score + 1;
-            __write 2, p2_score, p2_c;
+    fun XGreaterY_2(x:int, y:int) -> bool {
+        return x>y;
+    }
+
+    fun AverageOfTwo(x:int, y:int) -> float {
+        let t0:int = x + y;
+        let t1:float = t0 / 2 as float;
+        return t1;
+    }
+
+    fun AverageOfTwo_2(x:int, y:int) -> int {
+        return (x + y) / 2 as float;
+    }
+
+    fun Max(x:int, y:int) -> int {
+        let m:int = x;
+        if (y > x) { m = y; }
+        return m;
+    }
+
+    __write 10, 14, #00ff00;
+    __delay 100;
+    __write_box 10, 14, 2, 2, #0000ff;
+
+    for (let i:int = 0; i < 10; i = i + 1) {
+        __print i;
+        __delay 1000;
+    }
+
+    fun Race(p1_c:colour , p2_c:colour , score_max:int) -> int {
+        let p1_score:int = 0;
+        let p2_score:int = 0;
+        while ((p1_score < score_max) and (p2_score < score_max)) {
+            let p1_toss:int = __randi 1000;
+            let p2_toss:int = __randi 1000;
+            if (p1_toss > p2_toss) {
+                p1_score = p1_score + 1;
+                __write 1, p1_score, p1_c;
+            } else {
+                p2_score = p2_score + 1;
+                __write 2, p2_score, p2_c;
+            }
+            __delay 100;
         }
-        __delay 100;
+        if (p2_score > p1_score) {
+            return 2;
+        }
+        return 1;
     }
-    if (p2_score > p1_score) {
-        return 2;
-    }
-    return 1;
-}
-¢lexicalerror_
-let c1:colour = #00ff00;
-let c2:colour = #0000ff;
-let m:int = __height;
-let w:int = Race(c1, c2, m);
-__print w;
-""")
-with open("tokens.txt", "w") as f:
-    for t in toks:
-        f.write(f"{t}\n")
 
-for t in toks:
-    print(t)
+    let c1:colour = #00ff00;
+    let c2:colour = #0000ff;
+    let m:int = __height;
+    let w:int = Race(c1, c2, m);
+    __print w;
+    '''
+    toks = lex.GenerateTokens(input_code)
+    with open("tokens.txt", "w") as f:
+        for t in toks:
+            f.write(f"{t}\n")
+
+    for t in toks:
+        print(t)
