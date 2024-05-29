@@ -255,8 +255,18 @@ class Parser:
             self.advance()
             return LiteralNode(token[1])
         elif token[0] == 'IDENTIFIER':
+            identifier = token[1]
             self.advance()
-            return IdentifierNode(token[1])
+            if self.current_token[0] == 'DELIMITER' and self.current_token[1] == '(':
+                self.advance()  # skip '('
+                args = []
+                while self.current_token[0] != 'DELIMITER' or self.current_token[1] != ')':
+                    args.append(self.parse_expression())
+                    if self.current_token[0] == 'DELIMITER' and self.current_token[1] == ',':
+                        self.advance()  # skip ','
+                self.expect('DELIMITER', ')')
+                return FunctionCallNode(identifier, args)
+            return IdentifierNode(identifier)
         elif token[0] == 'DELIMITER' and token[1] == '(':
             self.advance()
             expr = self.parse_expression()
@@ -283,7 +293,7 @@ lexer = Lexer()
 input_code = '''
 fun XGreaterY(x:int, y:int) -> bool {
     let ans:bool = true;
-    if (y>x) {and = false;}
+    if (y>x) {ans = false;}
     return ans;
 }
 
