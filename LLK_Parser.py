@@ -353,7 +353,7 @@ let m:int = __height;
 let w:int = Race(c1, c2, m);
 __print w;
 '''
-tokens = lexer.tokenize(input_code)
+tokens = lexer.GenerateTokens(input_code)
 parser = Parser(tokens)
 ast = parser.parse()
 traverse(ast)
