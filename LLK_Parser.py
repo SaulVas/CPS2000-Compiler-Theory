@@ -364,7 +364,7 @@ if __name__ == '__main__':
     let w:int = Race(c1, c2, m);
     __print w;
     '''
-    tokens = lexer.GenerateTokens(input_code)
-    parser = Parser(tokens)
+    token_input = lexer.GenerateTokens(input_code)
+    parser = Parser(token_input)
     ast = parser.parse()
     traverse(ast)
