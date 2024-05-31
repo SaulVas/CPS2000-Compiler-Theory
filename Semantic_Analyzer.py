@@ -160,33 +160,17 @@ class SemanticAnalyzer:
 
 if __name__ == '__main__':
     input_code = '''
-    fun MoreThan50(x:int) -> bool {
-        let x:int = 23;
-        if (x <= 50) {
-            return false;
-        }
-        return true;
-    }
-
-    let x:int = 45;
-    while (x < 50) {
-        __print MoreThan50(x);
-        x = x + 1;
-    }
-
-    let x:int = 45;
-    while (MoreThan50(x)) {
-        __print MoreThan50(x);
-        x = x + 1;
-    }
-
+   fun AverageOfTwo(x:int, y:int) -> int {
+    let t0:int = x + y;
+    let t1:float = t0 / 2 as float;
+    return t1;
+}
     '''
 
     lexer = Lexer()
     tokens = lexer.GenerateTokens(input_code)
     parser = Parser(tokens)
     ast = parser.parse()
-    traverse(ast)
 
     # Perform semantic analysis
     analyzer = SemanticAnalyzer()

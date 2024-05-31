@@ -1,0 +1,11 @@
+let x:int = 45;
+while (x < 50) {
+    __print MoreThan50(x);
+    x = x + 1;
+}
+
+let x:int = 45;
+while (MoreThan50(x)) {
+    __print MoreThan50(x);
+    x = x + 1;
+}

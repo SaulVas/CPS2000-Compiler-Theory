@@ -1,0 +1,7 @@
+fun MoreThan50(x:int) -> bool {
+    let x:int = 23;
+    if (x <= 50) {
+        return false;
+    }
+    return true;
+}

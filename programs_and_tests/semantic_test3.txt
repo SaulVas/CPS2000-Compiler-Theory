@@ -1,0 +1,5 @@
+fun AverageOfTwo(x:int, y:int) -> int {
+    let t0:int = x + y;
+    let t1:float = t0 / 2 as float;
+    return t1;
+}

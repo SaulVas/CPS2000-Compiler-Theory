@@ -1,5 +1,3 @@
-Below is a correctly implemented program without comments:
-
 fun XGreaterY(x:int, y:int) -> bool {
     let ans:bool = true;
     if (y>x) {ans = false;}
@@ -62,35 +60,3 @@ let m:int = __height;
 let w:int = Race(c1, c2, m);
 __print w;
 
-
-Below is a program with semantic errors:
-this code is to be tested in 3 segments:
-
-segment 1:
-fun MoreThan50(x:int) -> bool {
-    let x:int = 23;
-    if (x <= 50) {
-        return false;
-    }
-    return true;
-}
-
-segment 2:
-let x:int = 45;
-while (x < 50) {
-    __print MoreThan50(x);
-    x = x + 1;
-}
-
-let x:int = 45;
-while (MoreThan50(x)) {
-    __print MoreThan50(x);
-    x = x + 1;
-}
-
-segment 3:
-fun AverageOfTwo(x:int, y:int) -> float {
-    let t0:int = x + y;
-    let t1:float = t0 / 2 as float;
-    return t1;
-}
