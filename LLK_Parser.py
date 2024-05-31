@@ -302,36 +302,13 @@ if __name__ == '__main__':
     # Example usage
     lexer = Lexer()
     input_code = '''
-    fun Min(x:int, y:int) -> int {
-    if (x < y) {
-        return x;
+    fun MoreThan50(x:int) -> bool {
+    let x:int = 23;
+    if (x <= 50) {
+        return false;
     }
-    return y;
+    return true;
 }
-
-fun Square(x:int) -> int {
-    return x * x;
-}
-
-__write 5, 10, #ff0000;
-__delay 75;
-__write_box 5, 10, 3, 3, #00ff00;
-
-for (let j:int = 0; j < 7; j = j + 1) {
-    __print j;
-    __delay 500;
-}
-
-fun Factorial(n:int) -> int {
-    let fact:int = 1;
-    for (let k:int = 1; k <= n; k = k + 1) {
-        fact = fact * k;
-    }
-    return fact;
-}
-
-__print Factorial(5);
-
     '''
     token_input = lexer.GenerateTokens(input_code)
     parser = Parser(token_input)

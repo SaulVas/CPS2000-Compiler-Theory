@@ -2975,4 +2975,6 @@ Exception: Return type mismatch in function with return type int: got float
 
 ### Video Link
 
-The video showcasing the sections running and the results optained may be found below:
+The video showcasing the sections running and the results obtained may be found below:
+
+https://drive.google.com/file/d/125zxnLoYGHoOL3WC_il4a_nuk28W-DT4/view?usp=sharing
